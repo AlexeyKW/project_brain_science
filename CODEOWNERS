@@ -1,0 +1,20 @@
+# Права записи (см. спецификацию §7). CI проверяет: PR агента,
+# тронувший защищённый путь без human-approval, не мержится.
+
+# Источник истины и политики — только человек
+.brain/brain.yaml               @alexey
+.brain/HOT/CONSTRAINTS.md      @alexey
+.brain/WARM/HYPOTHESES/         @alexey
+.brain/WARM/METHODS/preregistration/ @alexey
+.brain/WARM/DATA/               @alexey
+policy.yaml                     @alexey
+
+# Журналы и карточки — человек + аналитик (trust-повышение — только человек)
+.brain/WARM/CLAIMS/             @alexey
+.brain/WARM/FAILURES.md         @alexey
+.brain/WARM/EXPERIMENTS/        @alexey
+
+# Генерируемые адаптеры: правки руками откатываются CI
+AGENTS.md                       @alexey
+CLAUDE.md                       @alexey
+.cursor/rules/                  @alexey

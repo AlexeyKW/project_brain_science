@@ -1,0 +1,8 @@
+# DVC-указатель (образец). Реальный файл генерируется: dvc add data/raw/lst_kazan_2024_v3/
+meta:
+  id: DS-001
+  schema: dvc
+outs:
+  - md5: 3f8a9c2e1d4b5a6f7e8d9c0b1a2f3e4d  # пример; реальный md5 от dvc add
+    path: lst_kazan_2024_v3
+    size: 1873459200

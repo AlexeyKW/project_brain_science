@@ -1,0 +1,25 @@
+# environment.lock — воспроизводимое окружение эксперимента.
+# Формат: uv.lock / conda-lock + digest контейнера (см. §9 спецификации).
+# Этот файл — минимальный рабочий образец для скелета репозитория.
+
+lock_format: "1.0"
+generated: 2026-11-21
+
+container:
+  image: ghcr.io/alexey/uhi-kazan:2026.11.21
+  digest: sha256:7c1f9a4e02b3d84c55aa91f0e6d2b8c3e51f4a6709d12c88b5e6f0a1c3d2b4a5
+
+python: "3.12.7"
+
+# Полный lock генерируется:  uv lock && uv export --format frozen > environment.lock
+# Пока фиксируем ключевые версии, достаточные для smoke-прогона:
+packages:
+  numpy: "2.1.3"
+  pandas: "2.2.3"
+  rasterio: "1.4.2"
+  geopandas: "1.0.2"
+  scikit-learn: "1.5.2"
+  xarray: "2024.11.0"
+  netcdf4: "1.7.2"
+  pyyaml: "6.0.2"
+  jsonschema: "4.23.0"

@@ -1,0 +1,29 @@
+{
+  "experiment": "E-023",
+  "seed": 42,
+  "smoke": true,
+  "subset": 0.2,
+  "metrics": {
+    "beta_ndvi_per_0.1": -2.1692203696941705,
+    "beta_sd_across_blocks": 0.024663419876952454,
+    "r2_oob": 0.4286386799138281,
+    "blocks": 5
+  },
+  "expected": {
+    "beta_ndvi_per_0.1": -2.1,
+    "r2_oob": 0.42
+  },
+  "tolerance": 0.08,
+  "checks": {
+    "beta_ndvi_per_0.1": {
+      "expected": -2.1,
+      "got": -2.1692203696941705,
+      "passed": true
+    },
+    "r2_oob": {
+      "expected": 0.42,
+      "got": 0.4286386799138281,
+      "passed": true
+    }
+  }
+}
