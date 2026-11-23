@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brain.example/schema/decision.schema.json",
+  "title": "DECISIONS/D-*.md — ADR",
+  "description": "Контекст / альтернативы / выбор / последствия / что изменит решение. Decision coverage — метрика здоровья мозга.",
+  "allOf": [{ "$ref": "common.schema.json" }],
+  "type": "object",
+  "required": ["id", "type", "status", "trust", "confidence", "author", "created"],
+  "properties": {
+    "type": { "const": "decision" },
+    "status": { "enum": ["proposed", "accepted", "superseded", "reverted"] }
+  }
+}

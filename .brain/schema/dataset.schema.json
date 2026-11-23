@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brain.example/schema/dataset.schema.json",
+  "title": "DATACARDS/DS-*.md",
+  "description": "Датакарта: источник, лицензия, версия, хеш, известные дефекты, дата выгрузки. В git — только DVC-указатели.",
+  "allOf": [{ "$ref": "common.schema.json" }],
+  "type": "object",
+  "required": ["id", "type", "status", "author", "created", "valid_until"],
+  "properties": {
+    "type": { "const": "dataset" },
+    "status": { "enum": ["planned", "active", "frozen", "retired"] }
+  }
+}

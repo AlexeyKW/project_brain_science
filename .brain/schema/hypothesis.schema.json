@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brain.example/schema/hypothesis.schema.json",
+  "title": "HYPOTHESES/H-*.md — предрегистрация",
+  "description": "Формулировка, метрика, критерий успеха, план анализа, дата фиксации ДО первого прогона. Любое изменение — только через amendment (X-03).",
+  "allOf": [{ "$ref": "common.schema.json" }],
+  "type": "object",
+  "required": ["id", "type", "status", "trust", "confidence", "author", "created", "locked_before_data"],
+  "properties": {
+    "type": { "const": "hypothesis" },
+    "status": { "enum": ["proposed", "supported", "contested", "retracted", "superseded"] },
+    "locked_before_data": { "const": true },
+    "amendment": {
+      "description": "null или список append-only поправок; старая версия — в Git",
+      "type": ["null", "array"],
+      "items": {
+        "type": "object",
+        "required": ["date", "reason"],
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "reason": { "type": "string" },
+          "changes": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    }
+  }
+}

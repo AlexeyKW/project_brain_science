@@ -1,0 +1,8 @@
+# Append-only журналы: union-merge, чтобы параллельные сессии не конфликтовали
+.brain/WARM/FAILURES.md   merge=union
+.brain/COLD/sessions/**    merge=union
+.brain/WARM/LITERATURE/refs.bib  merge=union
+
+# Карточки — всегда текст
+.brain/**/*.md  text eol=lf
+.brain/**/*.yaml text eol=lf

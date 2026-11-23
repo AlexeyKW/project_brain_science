@@ -1,0 +1,22 @@
+# --- COLD: пересобираемые индексы ---
+.brain/COLD/.index/
+
+# --- Данные: в git только указатели DVC ---
+data/raw/
+data/interim/
+data/processed/
+!data/**/*.dvc
+!data/**/.gitkeep
+
+# --- Окружения ---
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# --- Сессии сырые ---
+.brain/COLD/sessions/*.log
+
+# --- Системное ---
+.DS_Store
+Thumbs.db

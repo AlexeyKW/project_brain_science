@@ -1,0 +1,57 @@
+---
+id: E-024
+type: experiment
+status: completed
+trust: machine-verified
+confidence: 0.8
+author: agent:claude-sonnet-4.6@2026-11-20
+created: 2026-11-20
+valid_until: 2027-02-01
+hypothesis: H-001
+decision: D-014
+tags: [uhs, ndvi, spatial-cv, replication]
+---
+
+# E-024 — репликация E-023 на пиксельном уровне (чувствительность агрегации)
+
+hypothesis: H-001
+protocol: "METHODS/protocols/spatial-cv.md"
+code: "src/models/spatial_cv.py@a9d02e7"
+
+environment:
+  lock: "environment.lock"
+  container_digest: "sha256:7c1f9a4e02b3d84c55aa91f0e6d2b8c3e51f4a6709d12c88b5e6f0a1c3d2b4a5"
+  python: "3.12.7"
+  seed: 42
+
+data:
+  inputs:
+    - id: DS-001
+      dvc_hash: "dvc:lst_kazan_2024_v3"
+      commit: "a9d02e7"
+    - id: DS-002
+      dvc_hash: "dvc:osm_kazan_20240615"
+      commit: "a9d02e7"
+  output: "data/processed/analysis_pixels.parquet"
+
+design:
+  unit: "пиксель LST (ресемплинг NDVI до 1 км), чувствительность H-001 к агрегации"
+  n: 51200
+  cv: {type: blocked-spatial, blocks: 5, clusters: 40, epsg: 3576}
+  model: "OLS, HC3; бутстрэп по блокам, B = 1000"
+
+results:
+  beta_ndvi_per_0.1: -2.0
+  ci95: [-2.5, -1.6]
+  r2_oob: 0.45
+  metrics_source: "results/metrics/E-024.metrics.json"
+  note: "Эффект устойчив к уровню агрегации; гетерогенность по районам значима (см. C-005 history)."
+
+evidence:
+  commit: a9d02e7
+  data_hash: "dvc:lst_kazan_2024_v3"
+  figures: ["results/fig_s1_ndvi_lst_pixels.png"]
+
+downstream:
+  supports: [C-007]
+  retracts: []

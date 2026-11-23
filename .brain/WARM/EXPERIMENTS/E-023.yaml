@@ -1,0 +1,70 @@
+---
+id: E-023
+type: experiment
+status: completed
+trust: machine-verified
+confidence: 0.85
+author: agent:claude-sonnet-4.6@2026-11-19
+reviewed_by: null          # ожидает human-review для публикации результатов
+created: 2026-11-19
+valid_until: 2027-02-01
+hypothesis: H-001
+decision: D-014
+tags: [uhs, ndvi, spatial-cv, smoke-target]
+---
+
+# E-023 — основной прогон: NDVI × LST, блочная spatial-CV
+
+hypothesis: H-001
+protocol: "METHODS/protocols/spatial-cv.md"
+code: "src/models/spatial_cv.py@9f3ac21"
+
+environment:
+  lock: "environment.lock"
+  container_digest: "sha256:7c1f9a4e02b3d84c55aa91f0e6d2b8c3e51f4a6709d12c88b5e6f0a1c3d2b4a5"
+  python: "3.12.7"
+  seed: 42
+
+data:
+  inputs:
+    - id: DS-001            # Sentinel-3 SLSTR LST, Казань, лето 2024
+      dvc_hash: "dvc:lst_kazan_2024_v3"
+      commit: "9f3ac21"
+    - id: DS-002            # OSM dump 2024-06-15
+      dvc_hash: "dvc:osm_kazan_20240615"
+      commit: "9f3ac21"
+  output: "data/processed/analysis_grid.parquet"
+
+design:
+  unit: "квартал (OSM-полигон)"
+  n: 12480
+  cv: {type: blocked-spatial, blocks: 5, clusters: 40, epsg: 3576}
+  model: "OLS, HC3 внутри блоков; бутстрэп по блокам, B = 1000"
+  covariates: [built_fraction, albedo_mean, soil_moisture_proxy]
+  multiplicity: {comparisons: 3, correction: holm, log: "EXPERIMENTS/E-023.multiplicity.yaml"}
+
+results:
+  beta_ndvi_per_0.1: -2.1       # °C
+  ci95: [-2.6, -1.7]
+  r2_oob: 0.42
+  metrics_source: "results/metrics/E-023.metrics.json"
+
+smoke:
+  # CI-перезапуск: 20% подвыборка; допуск 0.08 покрывает MC-ошибку среднего по 5 блокам
+  subset: 0.2
+  tolerance: 0.08
+  expected:
+    beta_ndvi_per_0.1: -2.1
+    r2_oob: 0.42
+
+evidence:
+  commit: 9f3ac21
+  data_hash: "dvc:lst_kazan_2024_v3"
+  figures: ["results/fig3_ndvi_lst.png"]
+  multiplicity_log: "EXPERIMENTS/E-023.multiplicity.yaml"
+  ci_run: "https://github.com/alexey/uhi-kazan/actions/runs/11892345"
+
+downstream:
+  supports: [C-007]
+  retracts: []
+  notes: "Метрики согласованы с F-019: случайная CV дала бы R² = 0.81 — недействительно."

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brain.example/schema/claim.schema.json",
+  "title": "CLAIMS/C-*.md",
+  "description": "Утверждение + доказательство. Тело обязано содержать: утверждение / основание / ограничения / что опровергнет (фальсифицируемость). X-01: ни одного числа без run_id.",
+  "allOf": [{ "$ref": "common.schema.json" }],
+  "type": "object",
+  "required": ["id", "type", "status", "trust", "confidence", "author", "created", "evidence"],
+  "properties": {
+    "type": { "const": "claim" },
+    "status": { "enum": ["proposed", "supported", "contested", "retracted", "superseded"] },
+    "evidence": {
+      "type": "object",
+      "description": "Нет прогона — нет числа; нет claim без evidence",
+      "required": ["runs", "commit"],
+      "properties": {
+        "runs": {
+          "type": "array", "minItems": 1,
+          "items": { "type": "string", "pattern": "^E-[0-9]{3}$" }
+        },
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{7,40}$" },
+        "data_hash": { "type": "string", "pattern": "^dvc:.+" },
+        "figures": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "used_in": { "type": ["string", "null"], "description": "якорь в рукописи, напр. paper/sections/results.md#L42" }
+  }
+}

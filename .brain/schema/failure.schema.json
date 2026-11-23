@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brain.example/schema/failure.schema.json",
+  "title": "FAILURES.md — записи F-*",
+  "description": "Отрицательный результат — полноправный класс памяти; пишется всегда до закрытия сессии (X-05). Append-only.",
+  "type": "object",
+  "required": ["id", "type", "date", "found_by", "severity"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^F-[0-9]{3}$" },
+    "type": { "const": "failure" },
+    "date": { "type": "string", "format": "date" },
+    "found_by": { "type": "string", "pattern": "^(human:.+|agent-role:.+)$" },
+    "severity": { "enum": ["low", "medium", "high"] },
+    "experiment": { "type": ["string", "array", "null"], "items": { "type": "string", "pattern": "^E-[0-9]{3}$" } },
+    "retracted_claims": { "type": "array", "items": { "type": "string", "pattern": "^C-[0-9]{3}$" } }
+  },
+  "additionalProperties": true
+}

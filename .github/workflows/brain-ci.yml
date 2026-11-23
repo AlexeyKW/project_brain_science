@@ -1,0 +1,113 @@
+name: brain-ci
+
+# Иммунная система памяти (спецификация §8). Проверки на каждом PR:
+# 1 схема · 2 граф · 3 воспроизводимость · 4 цитаты · 5 свежесть · 6 приватность · 7 адаптеры.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  BRAIN: .brain
+  SMOKE_TARGET: E-023          # ключевой прогон для check 3
+
+jobs:
+  # ---- 1+2: схема и целостность графа ----
+  schema-and-graph:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml jsonschema referencing
+      - name: validate (schema + graph)
+        run: python src/validate_brain.py --brain "$BRAIN"
+
+  # ---- 3: воспроизводимость (smoke-перезапуск с допуском) ----
+  reproduce:
+    runs-on: ubuntu-latest
+    needs: schema-and-graph
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml numpy
+      - name: smoke-прогон ключевого эксперимента
+        run: make reproduce "$SMOKE_TARGET"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: smoke-metrics
+          path: results/metrics/*.smoke.json
+
+  # ---- 4: цитаты (DOI-резолвинг, запрет [UNVERIFIED] в рукописи) ----
+  citations:
+    runs-on: ubuntu-latest
+    needs: schema-and-graph
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - run: python src/check_citations.py --brain "$BRAIN"
+
+  # ---- 5: свежесть (истёкшие valid_until и «сироты» → issue) ----
+  freshness:
+    runs-on: ubuntu-latest
+    needs: schema-and-graph
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml jsonschema referencing
+      - name: отчёт о свежести (падает при >10% stale)
+        run: python src/validate_brain.py --brain "$BRAIN" --stale-fail 0.10
+
+  # ---- 6: приватность (сканер ПДн/лицензий, embargo) ----
+  privacy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: в git нет сырых данных (только .dvc-указатели)
+        run: |
+          bad=$(git ls-files data/ | grep -v '\.dvc$' | grep -v '\.gitkeep$' || true)
+          if [ -n "$bad" ]; then echo "Сырые данные в git: $bad"; exit 1; fi
+      - name: сканер ПДн-паттернов (паспорт, СНИЛС, ИНН, телефоны)
+        run: |
+          if grep -rInE '([0-9]{4}[- ]?[0-9]{6})|(СНИЛС|ИНН|паспорт)|(\+7[ -]?[0-9]{3})' \
+               --include='*.md' --include='*.yaml' .brain data paper 2>/dev/null; then
+            echo "Возможные ПДн найдены (X-07)"; exit 1
+          fi
+
+  # ---- 7: адаптеры собираются из .brain, а не правятся руками ----
+  adapters:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: регенерация адаптеров и сверка с коммитом
+        run: |
+          python src/render_adapters.py --brain "$BRAIN"
+          git diff --exit-code -- AGENTS.md CLAUDE.md .cursor/rules \
+            || (echo "Адаптеры изменены вручную — перегенерируйте через 'make adapters' (X-08)"; exit 1)
+
+  # ---- сводка метрик здоровья мозга ----
+  metrics:
+    runs-on: ubuntu-latest
+    needs: [schema-and-graph, reproduce, citations, freshness, privacy, adapters]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - run: python src/brain_metrics.py --brain "$BRAIN"

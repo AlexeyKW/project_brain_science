@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brain.example/schema/experiment.schema.json",
+  "title": "EXPERIMENTS/E-*.yaml — прогон",
+  "description": "Прогон с хешем данных, окружением и seed как доказательство. Нет run без хеша данных и lock-файла окружения (CI check 2).",
+  "allOf": [{ "$ref": "common.schema.json" }],
+  "type": "object",
+  "required": ["id", "type", "status", "trust", "confidence", "author", "created", "hypothesis", "environment", "data", "results"],
+  "properties": {
+    "type": { "const": "experiment" },
+    "status": { "enum": ["planned", "running", "completed", "invalid"] },
+    "hypothesis": { "type": "string", "pattern": "^H-[0-9]{3}$" },
+    "environment": {
+      "type": "object",
+      "required": ["lock", "seed"],
+      "properties": {
+        "lock": { "const": "environment.lock" },
+        "container_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "python": { "type": "string" },
+        "seed": { "type": "integer" }
+      },
+      "additionalProperties": true
+    },
+    "data": {
+      "type": "object",
+      "required": ["inputs"],
+      "properties": {
+        "inputs": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "dvc_hash"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^DS-[0-9]{3}$" },
+              "dvc_hash": { "type": "string", "pattern": "^dvc:.+" },
+              "commit": { "type": "string", "pattern": "^[0-9a-f]{7,40}$" }
+            },
+            "additionalProperties": true
+          }
+        },
+        "output": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "results": { "type": "object", "description": "Метрики с указанием источника (metrics_source)" },
+    "smoke": {
+      "type": "object",
+      "description": "Параметры CI-перезапуска: make reproduce E-XXX",
+      "properties": {
+        "subset": { "type": "number", "minimum": 0, "maximum": 1 },
+        "tolerance": { "type": "number", "minimum": 0 },
+        "expected": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "downstream": { "type": "object", "additionalProperties": true }
+  }
+}

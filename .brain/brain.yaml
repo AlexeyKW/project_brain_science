@@ -1,0 +1,49 @@
+# brain.yaml — манифест Research Brain. Источник истины проекта.
+schema_version: "1.0"
+generated_adapters: [AGENTS.md, CLAUDE.md, .cursor/rules/]
+
+project:
+  id: uhi-kazan
+  title: "Тепловые острова и зелёные зоны: NDVI × LST (Казань)"
+  domain: urban-climate / remote-sensing
+  language: ru
+
+# Бюджеты контекста (см. спецификацию §6)
+budgets:
+  hot_tokens: 2500            # INDEX + HANDOFF + CONSTRAINTS, грузятся всегда
+  warm_card_tokens: [200, 600] # адресная подгрузка одной карточки
+  card_max_bytes: 8000        # защита от мусорной памяти (§12)
+
+# Политики доверия (§4): агент НЕ может повысить trust собственной записи
+trust_policy:
+  ladder: [ai-inferred, machine-verified, human-verified, published]
+  promotion:
+    to_machine_verified: "CI run с совпавшими хешами данных и окружения"
+    to_human_verified: "подписанный коммит / PR-review человека"
+    to_published: "внешний акт: препринт/статья с DOI"
+  manuscript_block: ai-inferred   # подсвечиваются и блокируют сборку рукописи
+
+# Права записи (§7) — дублируются в CODEOWNERS, CI проверяет оба
+write_policy:
+  scout:        { write: [LITERATURE],                            trust_ceiling: ai-inferred }
+  data_steward: { write: [DATA],                                  trust_ceiling: ai-inferred }
+  analyst:      { write: [EXPERIMENTS, CLAIMS],                   trust_ceiling: ai-inferred }
+  critic:       { write: [FAILURES],                              trust_ceiling: ai-inferred }
+  scribe:       { write: [HANDOFF, INDEX],                        trust_ceiling: ai-inferred }
+  human:        { write: [all],                                   trust_ceiling: published }
+
+# Свежесть памяти (§8, check 5)
+staleness:
+  orphan_after_days: 14        # карточка не обновлялась при активных изменениях кода
+  report: issue                # устаревшие valid_until → issue в CI
+
+# Этика / приватность (CONSTRAINTS §7)
+privacy:
+  embargo_until: 2027-03-01
+  pii_scan: true
+
+# Связь с внешними системами (§9)
+external:
+  dvc_remote: s3://uhi-kazan-dvc      # в git только .dvc-указатели
+  preregistration: OSF                # METHODS/preregistration ↔ OSF-запись
+  publication_target: [RO-Crate, Zenodo DOI]

@@ -1,0 +1,39 @@
+# datasets.yaml — реестр датасетов проекта. Полные датакарты: DATA/DATACARDS/.
+# В git — только указатели DVC (.dvc); сырые данные в data/ gitignored.
+
+datasets:
+  - id: DS-001
+    name: "Sentinel-3 SLSTR LST, Казань, лето 2024"
+    dvc_pointer: "data/raw/lst_kazan_2024_v3.dvc"
+    dvc_hash: "dvc:lst_kazan_2024_v3"
+    license: "CC-BY-4.0 (Copernicus)"
+    steward: data_steward
+    status: active
+    datacard: "DATA/DATACARDS/sentinel-lst-kazan-2024.md"
+
+  - id: DS-002
+    name: "OpenStreetMap extract, Казань, дамп 2024-06-15"
+    dvc_pointer: "data/raw/osm_kazan_20240615.dvc"
+    dvc_hash: "dvc:osm_kazan_20240615"
+    license: "ODbL-1.0"
+    steward: data_steward
+    status: active
+    datacard: "DATA/DATACARDS/osm-kazan-dump-2024.md"
+    note: "Датафиксация дампа критична: источник живой (§9 спецификации)."
+
+  - id: DS-003
+    name: "Высота застройки (DSM / городской слой) — ПЛАН"
+    dvc_pointer: null
+    dvc_hash: null
+    license: "уточняется"
+    steward: human
+    status: planned
+    datacard: null
+    note: "Нужен для снятия ограничения C-007; вопрос открыт в HANDOFF."
+
+external:
+  preregistration:
+    hypothesis: H-001
+    platform: OSF
+    record_url: "https://osf.io/XXXXX"   # подставить реальный ID при регистрации
+    local_copy: "METHODS/preregistration/H-001-prereg.md"

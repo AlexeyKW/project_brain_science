@@ -1,0 +1,37 @@
+# verified.yaml — единственный список ссылок, разрешённых для рукописи без [UNVERIFIED].
+# CI (check: citations) резолвит DOI/URL и сверяет с refs.bib.
+# Пополняет: роль Scout (статус ai-inferred), подтверждает: человек (human-verified).
+
+verified:
+  - citekey: estoque2017global
+    doi: "10.1371/journal.pone.0185930"
+    url: "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0185930"
+    resolved_by: ci
+    resolved_at: 2026-11-10
+    trust: machine-verified
+
+  - citekey: robertsspatiotemporal
+    doi: "10.1111/ecog.02881"
+    url: "https://onlinelibrary.wiley.com/doi/10.1111/ecog.02881"
+    resolved_by: ci
+    resolved_at: 2026-11-10
+    trust: machine-verified
+
+  - citekey: osm2024kazan
+    url: "https://download.geofabrik.de/russia/central-fed-district.html"
+    resolved_by: human
+    resolved_at: 2026-11-03
+    trust: human-verified
+    note: "Датафиксация дампа обязательна при каждом обновлении (источник живой)."
+
+  - citekey: sentinel3lst
+    url: "https://sentiwiki.copernicus.eu/web/s3-lst-products"
+    resolved_by: human
+    resolved_at: 2026-11-03
+    trust: human-verified
+
+unverified:
+  # Не разрешены для рукописи: в тексте → [UNVERIFIED] и блок сборки при наличии в paper/.
+  - citekey: weng2019thermal
+    reason: "DOI не подтверждён; запись в refs.bib редактируется. Убрать из results.md §2.1."
+    opened: 2026-11-19
